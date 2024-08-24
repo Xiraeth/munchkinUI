@@ -1,26 +1,57 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import "./styles/App.css";
 import AddMunchkinButton from "./components/Buttons/AddMunchkinButton";
+import MunchkinsSection from "./components/MunchkinsSection";
 import MunchkinCard from "./components/MunchkinCard";
-import { MunchkinProvider, useMunchkinContext } from "./context";
+import { v4 as uuidv4 } from "uuid";
 
 function App() {
-  return (
-    <MunchkinProvider>
-      <MainAppContent />
-    </MunchkinProvider>
-  );
-}
+  const munchkinsArray = localStorage.getItem("munchkinsArray") || "[]";
 
-function MainAppContent() {
-  const { munchkins, addMunchkin } = useMunchkinContext();
+  const [munchkins, setMunchkins] = useState(JSON.parse(munchkinsArray));
+  console.log(munchkins);
+
+  useEffect(() => {
+    localStorage.setItem("munchkinsArray", JSON.stringify(munchkins));
+  }, [munchkins]);
+
+  const addMunchkin = () => {
+    const id = uuidv4();
+
+    setMunchkins([
+      ...munchkins,
+      {
+        id,
+        name: "",
+        level: 1,
+        strength: 1,
+        classes: [],
+        races: [],
+        gender: "",
+        halfBreed: false,
+        superMunchkin: false,
+      },
+    ]);
+  };
+
+  const deleteMunchkin = (e) => {
+    setMunchkins(munchkins.filter((mun) => mun.id !== e.id));
+  };
 
   return (
     <>
       <AddMunchkinButton onClick={addMunchkin} />
-      {munchkins.map((munchkin) => (
-        <MunchkinCard key={munchkin.id} munchkinId={munchkin.id} />
-      ))}
+      <MunchkinsSection>
+        {munchkins &&
+          munchkins.map((munchkin) => {
+            return (
+              <MunchkinCard
+                key={munchkin.id}
+                deleteMunchkin={() => deleteMunchkin(munchkin)}
+              />
+            );
+          })}
+      </MunchkinsSection>
     </>
   );
 }

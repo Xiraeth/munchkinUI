@@ -19,14 +19,11 @@ import RacesWrapper from "./Races/RacesWrapper";
 import AddRaceButton from "./Races/AddRaceButton";
 import RemoveRaceButton from "./Races/RemoveRaceButton";
 import HalfbreedCheckbox from "./Races/HalfBreedCheckbox";
-import { useMunchkinContext } from "../context";
 
 const allRaces = ["Human", "Dwarf", "Halfling", "Elf", "Gnome"];
 const allClasses = ["Wizard", "Thief", "Bard", "Warrior", "Cleric"];
 
-export default function MunchkinCard({ munchkinId }) {
-  const { deleteMunchkin } = useMunchkinContext();
-
+export default function MunchkinCard({ munchkinId, deleteMunchkin }) {
   const munchkinsArray =
     JSON.parse(localStorage.getItem("munchkinsArray")) || [];
 
@@ -72,7 +69,7 @@ export default function MunchkinCard({ munchkinId }) {
   };
 
   return (
-    <div className="relative w-full bg-slate-700/80 py-2 px-6 rounded-md text-white border-indigo-400 border-2 munchkinCard">
+    <div className="relative w-full bg-slate-700/80 py-2 px-6 rounded-md text-white border-indigo-400 border-2 munchkinCard mb-5">
       <DeleteMunchkinButton onClick={() => deleteMunchkin(munchkinId)} />
 
       <NameInput value={nameValue} onChange={setNameValue} />
