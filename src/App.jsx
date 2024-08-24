@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./styles/App.css";
-import AddMunchkinButton from "./components/AddMunchkinButton";
+import AddMunchkinButton from "./components/Buttons/AddMunchkinButton";
 import MunchkinsSection from "./components/MunchkinsSection";
 import MunchkinCard from "./components/MunchkinCard";
 import { v4 as uuidv4 } from "uuid";

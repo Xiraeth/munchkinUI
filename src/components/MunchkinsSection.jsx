@@ -1,3 +1,3 @@
 export default function MunchkinsSection({ children }) {
-  return <>{children}</>;
+  return <div>{children}</div>;
 }
