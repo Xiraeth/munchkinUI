@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
 import CenteredDivFlexCol from "./CenteredDivFlexCol";
 import NameInput from "./NameInput";
@@ -20,21 +21,67 @@ import AddRaceButton from "./Races/AddRaceButton";
 import RemoveRaceButton from "./Races/RemoveRaceButton";
 import HalfbreedCheckbox from "./Races/HalfBreedCheckbox";
 
-const allRaces = ["Human", "Dwarf", "Halfling", "Elf", "Gnome"];
+const allRaces = ["Human", "Dwarf", "Halfling", "Elf", "Gnome", "Orc"];
 const allClasses = ["Wizard", "Thief", "Bard", "Warrior", "Cleric"];
 
-export default function MunchkinCard({ munchkinId, deleteMunchkin }) {
-  const munchkinsArray =
-    JSON.parse(localStorage.getItem("munchkinsArray")) || [];
+export default function MunchkinCard({
+  munchkinId,
+  deleteMunchkin,
+  munchkins,
+}) {
+  const munchkin = munchkins.find((mun) => mun.id === munchkinId) || "";
 
-  console.log(munchkinsArray);
-  const [levelValue, setLevelValue] = useState(1);
-  const [strengthValue, setStrengthValue] = useState(1);
-  const [nameValue, setNameValue] = useState("");
-  const [gender, setGender] = useState("");
+  const [levelValue, setLevelValue] = useState(munchkin.level || 1);
+  const [strengthValue, setStrengthValue] = useState(munchkin.strength || 1);
+  const [nameValue, setNameValue] = useState(munchkin.name || "");
+  const [gender, setGender] = useState(munchkin.gender || "");
 
-  const [classes, setClasses] = useState([""]);
-  const [races, setRaces] = useState(["Human"]);
+  const [classes, setClasses] = useState(munchkin.classes || []);
+  const [races, setRaces] = useState(munchkin.races || []);
+
+  const [isHalfBreed, setIsHalfBreed] = useState(munchkin.halfBreed || false);
+  const [isSuperMunchkin, setIsSuperMunchkin] = useState(
+    munchkin.superMunchkin || false
+  );
+
+  useEffect(() => {
+    const munchkinIndex = munchkins.findIndex(
+      (munchkin) => munchkin.id === munchkinId
+    );
+
+    if (munchkinIndex !== -1) {
+      const updatedMunchkinsArray = [...munchkins];
+
+      updatedMunchkinsArray[munchkinIndex] = {
+        ...updatedMunchkinsArray[munchkinIndex],
+        name: nameValue,
+        level: levelValue,
+        strength: strengthValue,
+        classes: classes,
+        races,
+        gender,
+        halfBreed: isHalfBreed,
+        superMunchkin: isSuperMunchkin,
+      };
+
+      console.log(updatedMunchkinsArray);
+
+      localStorage.setItem(
+        "munchkinsArray",
+        JSON.stringify(updatedMunchkinsArray)
+      );
+    }
+  }, [
+    levelValue,
+    strengthValue,
+    nameValue,
+    gender,
+    classes,
+    races,
+    isHalfBreed,
+    isSuperMunchkin,
+    munchkinId,
+  ]);
 
   const changeClasses = (index, e) => {
     setClasses((prevClasses) => {
@@ -64,15 +111,37 @@ export default function MunchkinCard({ munchkinId, deleteMunchkin }) {
     setStrengthValue(e.target.value);
   };
 
+  const levelUp = () => {
+    setLevelValue((levelValue) => +levelValue + 1);
+    setStrengthValue((strengthValue) => +strengthValue + 1);
+  };
+
+  const levelDown = () => {
+    setLevelValue((levelValue) => levelValue - 1);
+    setStrengthValue((strengthValue) => strengthValue - 1);
+  };
+
   const changeGender = (e) => {
     setGender(e.target.value);
+  };
+
+  const toggleSuperMunchkin = () => {
+    setIsSuperMunchkin(!isSuperMunchkin);
+  };
+
+  const toggleHalfBreed = () => {
+    setIsHalfBreed(!isHalfBreed);
+  };
+
+  const changeNameValue = (e) => {
+    setNameValue(e.target.value);
   };
 
   return (
     <div className="relative w-full bg-slate-700/80 py-2 px-6 rounded-md text-white border-indigo-400 border-2 munchkinCard mb-5">
       <DeleteMunchkinButton onClick={() => deleteMunchkin(munchkinId)} />
 
-      <NameInput value={nameValue} onChange={setNameValue} />
+      <NameInput value={nameValue} onChange={changeNameValue} />
 
       <SelectGender onChange={changeGender} value={gender} />
 
@@ -90,8 +159,8 @@ export default function MunchkinCard({ munchkinId, deleteMunchkin }) {
           id="strengthInput"
         />
         <div className="flex gap-4 self-end">
-          <LevelUpButton onClick={setLevelValue} levelValue={levelValue} />
-          <LevelDownButton onClick={setLevelValue} levelValue={levelValue} />
+          <LevelUpButton onClick={levelUp} levelValue={levelValue} />
+          <LevelDownButton onClick={levelDown} levelValue={levelValue} />
         </div>
       </LevelStrengthWrapper>
 
@@ -106,16 +175,18 @@ export default function MunchkinCard({ munchkinId, deleteMunchkin }) {
             <AllClassesSelect
               allClasses={allClasses}
               classes={classes}
-              changeClasses={changeClasses}
+              onChange={changeClasses}
               indexOfClassInput={0}
+              value={classes[0]}
             />
             {/* 2nd class, if it exists */}
             {classes.length === 2 && (
               <AllClassesSelect
                 allClasses={allClasses}
                 classes={classes}
-                changeClasses={changeClasses}
+                onChange={changeClasses}
                 indexOfClassInput={1}
+                value={classes[1]}
               />
             )}
           </div>
@@ -123,7 +194,7 @@ export default function MunchkinCard({ munchkinId, deleteMunchkin }) {
             <AddClassButton onClick={setClasses} />
             <RemoveClassButton onClick={setClasses} />
           </div>
-          <SupermunchkinCheckbox />
+          <SupermunchkinCheckbox onChange={toggleSuperMunchkin} />
         </ClassesWrapper>
 
         {/* races */}
@@ -152,7 +223,7 @@ export default function MunchkinCard({ munchkinId, deleteMunchkin }) {
               <AddRaceButton onClick={setRaces} />
               <RemoveRaceButton onClick={setRaces} />
             </div>
-            <HalfbreedCheckbox />
+            <HalfbreedCheckbox onChange={toggleHalfBreed} />
           </RacesWrapper>
         </div>
       </div>

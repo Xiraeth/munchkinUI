@@ -1,8 +1,8 @@
-export default function NameInput({ nameValue, onChange }) {
+export default function NameInput({ value, onChange }) {
   return (
     <input
-      value={nameValue}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={onChange}
+      value={value}
       type="text"
       id="munchkinName"
       placeholder="Name"

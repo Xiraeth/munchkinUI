@@ -1,7 +1,7 @@
 export default function AllClassesSelect({
   allClasses,
   classes,
-  changeClasses,
+  onChange,
   indexOfClassInput,
 }) {
   const indexOfClassToCheck = indexOfClassInput === 0 ? 1 : 0;
@@ -11,7 +11,7 @@ export default function AllClassesSelect({
       className="text-lg outline-none border-b-2 border-b-rose-500 bg-slate-700 px-1 text-white"
       name="classSelect"
       id="classSelect"
-      onChange={(e) => changeClasses(indexOfClassInput, e)}
+      onChange={(e) => onChange(indexOfClassInput, e)}
     >
       <option value="" defaultChecked></option>
       {allClasses
